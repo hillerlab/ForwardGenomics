@@ -28,4 +28,5 @@ On simulated data, GLS and especially the branch method, have substantially more
 
 # References
 [1] Hiller M, Schaar BT, Indjeian VB, Kingsley DM, Hagey LR, and Bejerano G. (2012): A "forward genomics" approach links genotype to phenotype using independent phenotypic losses among related species. Cell Reports, 2(4), 817-823
+
 [2] Prudent X et al. in preparation
