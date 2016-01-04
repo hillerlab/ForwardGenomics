@@ -21,6 +21,9 @@ On simulated data, GLS and especially the branch method, have substantially more
 
 
 # Installation
+You need R version 3.02 or later and the R packages [caper](https://cran.r-project.org/web/packages/caper), [xtermStyle](https://cran.r-project.org/web/packages/xtermStyle), [phangorn](https://cran.r-project.org/web/packages/phangorn), [weights](https://cran.r-project.org/web/packages/weights), and [isotone](https://cran.r-project.org/web/packages/isotone). forwardGenomics.R will try to install them. 
+
+You also need tree_doctor from the [phast](http://compgen.cshl.edu/phast/) package. tree_doctor must be in your $PATH. Test it by running 'tree_doctor -p' in your command line.
 
 # Input Files
 You need to have these input files:
@@ -81,7 +84,70 @@ Rat-Mouse ID1 0.90097
 
 
 # HowTo
+By default, forwardGenomics.R runs perfect-match, GLS and the branch method. This means, you need to provide both local and global %id values. Use the --methods parameter to run only perfect-match/GLS on global and only the branch method on local %id values. 
 
+The branch method should be run separately on genomic regions that are coding (CDS) and non-coding (CNE). The reason is that the branch method needs to know the branch weights and expected %id values for every branch, and they differ for coding and non-coding regions. The directory lookUpData provides weights and expected %id values for both coding and non-coding regions. By default, the branch methods assumes you have coding regions (forwardGenomics.R will load branchWeights_CDS.txt and expPercentID_CDS.txt in lookUpData/). **If you have non-coding regions, you need to set --weights and --expectedPerIDs parameter.**
+
+By default, GLS will normalize the %id values to control for differences in evolutionary rates and it will only consider elements where the given %id values imply at least 2 independent loss events to avoid elements with lineage-specific losses (e.g. in case 1 of 2 independent trait-loss species has missing data). 
+
+All default values can be changed by parameters. 
+
+## Example usage
+```
+forwardGenomics.R --tree=example/tree_ancestor.nh --elementIDs=example/IDlist.txt --listPheno=example/listPhenotype.txt --globalPid=example/globalPercentID_CDS.txt --localPid=example/localPercentID_CDS.txt --outFile=example/myOutput.txt
+```
+## All parameters
+```
+Mandatory arguments:
+--tree          = filename
+                Phylogenetic tree with branch lengths in newick format. The species names must be identical to the names in the percent ID files. Ancestors must be named (otherwise use tree_doctor -a)
+
+--elementIDs    = filename
+                File listing the ID of each element (genomic region) that should be processed. 
+                If you want to process all elements, you can get this list with 'tail -n +2 globalPercentID.file | cut -f1 -d " "'
+
+--listPheno     = filename
+                File listing the phenotype for all species (all leaves in the tree). Must be a space-separated file the header 'species pheno', where 0 means trait is lost and 1 means trait is present.
+
+--globalPid     = filename
+                Only if you run GLS: Space-separated input file with the global %id values arranged in elements (row) x species (columns). First column must be the element ID. The first line must start with 'species'. 
+
+--localPid      = filename
+                Only if you run the branch method: Space-separated input file with the local %id values. Must have the header 'branch id pid'. One line per element and per branch. 
+
+--outFile       = filename
+                Output file that will contain the element ID and the P-values from the methods.
+
+
+General optional arguments:
+--method        = 'branch', 'GLS', 'all'
+                Which method to run. GLS includes computing the margin of the perfect-match method. Default is all.
+
+--verbose       = TRUE / FALSE
+                Show much more info and create plots for each element. Default is FALSE
+
+--outPath       = /dir/to/outputScatterPlots/
+                If verbose==TRUE, this directory will be created and will contain scatter plots for each element. If verbose==FALSE, this parameter has no effect. Default directory '.'
+
+
+Optional arguments for GLS:
+--minLosses     = number
+                In case of missing data (no %id value for some species) only consider elements where at least this many independent loss events are supported with %id values. Can be used to exclude lineage-specific losses. Default 2
+
+--transf        = 'raw' or 'normalized'
+                Whether to use raw global %id values or normalize them for the differences in evolutionary rates. Default normalized
+
+
+Optional arguments for the branch method:
+--weights       = filename
+                File listing the weights per branch. Must have a header 'len w'. Default is the file for coding exons: lookUpData/branchWeights_CDS.txt. Use lookUpData/branchWeights_CNE.txt for non-coding genomic regions.
+
+--expectedPerIDs = filename
+                File listing the expected %id values for each branch length. Must have a header 'len mPid'. Default is the file for coding exons: lookUpData/expPercentID_CDS.txt. Use lookUpData/expPercentID_CNE.txt for non-coding genomic regions.
+
+--thresholdConserved = floating point number
+                Some element may have large indels on internal conserved branches, but descendant branches are highly conserved. We reject genomic elements if a local %id value is lower than this threshold for a conserved branch. Set to 0 to ignore this. Default: 0.5
+```
 
 # References
 [1] Hiller M, Schaar BT, Indjeian VB, Kingsley DM, Hagey LR, and Bejerano G. (2012): A "forward genomics" approach links genotype to phenotype using independent phenotypic losses among related species. Cell Reports, 2(4), 817-823
