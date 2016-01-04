@@ -23,14 +23,14 @@ On simulated data, GLS and especially the branch method, have substantially more
 # Installation
 You need R version 3.02 or later and the R packages [caper](https://cran.r-project.org/web/packages/caper), [xtermStyle](https://cran.r-project.org/web/packages/xtermStyle), [phangorn](https://cran.r-project.org/web/packages/phangorn), [weights](https://cran.r-project.org/web/packages/weights), and [isotone](https://cran.r-project.org/web/packages/isotone). forwardGenomics.R will try to install them. 
 
-You also need tree_doctor from the [phast](http://compgen.cshl.edu/phast/) package. tree_doctor must be in your $PATH. Test it by running 'tree_doctor -p' in your command line.
+You also need tree_doctor from the [phast](http://compgen.cshl.edu/phast/) package. tree_doctor must be in your $PATH. Test it by running ```tree_doctor -p``` in your command line.
 
 # Input Files
 You need to have these input files:
 
 #####1: Phylogenetic tree
 This file should contain the tree with branch lengths in newick format. 
-The ancestors must be named, otherwise use tree_doctor -a to name them. 
+The ancestors must be named, otherwise use ```tree_doctor -a``` to name them. 
 
 Example: 
 ```
