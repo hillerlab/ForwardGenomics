@@ -25,7 +25,9 @@ On simulated data, GLS and especially the branch method, have substantially more
 # Input Files
 You need to have these input files:
 
-1: The tree with branch lengths in newick format. The ancestors must be named, otherwise use tree_doctor -a to name them. 
+#####1: Phylogenetic tree
+This file should contain the tree with branch lengths in newick format. 
+The ancestors must be named, otherwise use tree_doctor -a to name them. 
 
 Example: 
 ```
@@ -33,7 +35,9 @@ Example:
 ```
 
 
-2: A file listing the identifiers of each element (genomic region) that should be processed. If you want to process all elements, you can get this list from the global percent-identity file with 'tail -n +2 globalPid.file | cut -f1 -d " "'
+#####2: List of element identifiers
+This file should list the identifiers of each element (genomic region) that should be processed. 
+If you want to process all elements, you can get this list from the global percent-identity file with 'tail -n +2 globalPid.file | cut -f1 -d " "'
 
 Example: 
 ```
@@ -42,7 +46,8 @@ ID5
 ID8
 ```
 
-3: A file listing which species has the phenotype (state 1) and which species have lost it (state 0). List all species (leaves in the tree) where you know the phenotypic state, omit all others. Must be a space-separated file the header 'species pheno'.
+#####3: Phenotype list
+A file listing which species has the phenotype (state 1) and which species have lost it (state 0). List all species (leaves in the tree) where you know the phenotypic state, omit all others. Must be a space-separated file the header 'species pheno'.
 
 Example: 
 ```
@@ -52,7 +57,8 @@ Mouse 0
 ```
 
 
-4: A file listing the global %id values if you want to run the GLS method and/or a file listing the local (per-branch) %id values if you want to run the branch method. 
+#####4: %id values
+A file listing the global %id values if you want to run the GLS method and/or a file listing the local (per-branch) %id values if you want to run the branch method. 
 
 Format globalPid.file: Space-separated table with global %id values per element (row) x species (columns). First column must be the element identifier. The first line must start with 'species'. 
 Example:
