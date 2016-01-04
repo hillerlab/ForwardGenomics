@@ -40,7 +40,8 @@ Example:
 
 #####2: List of element identifiers
 This file should list the identifiers of each element (genomic region) that should be processed. 
-If you want to process all elements, you can get this list from the global percent-identity file with 'tail -n +2 globalPid.file | cut -f1 -d " "'
+If you want to process all elements, you can get this list from the global percent-identity file with 
+```tail -n +2 globalPid.file | cut -f1 -d " "```
 
 Example: 
 ```
