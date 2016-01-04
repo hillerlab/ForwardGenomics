@@ -22,6 +22,57 @@ On simulated data, GLS and especially the branch method, have substantially more
 
 # Installation
 
+# Input Files
+You need to have these input files:
+
+1: The tree with branch lengths in newick format. The ancestors must be named, otherwise use tree_doctor -a to name them. 
+
+Example: 
+```
+((Human:0.148845,(Rat:0.091589,Mouse:0.084509)Rat-Mouse:0.271974)Human-Rat:0,Dog:0.194257)Human-Dog
+```
+
+
+2: A file listing the identifiers of each element (genomic region) that should be processed. If you want to process all elements, you can get this list from the global percent-identity file with 'tail -n +2 globalPid.file | cut -f1 -d " "'
+
+Example: 
+```
+ID1
+ID5
+ID8
+```
+
+3: A file listing which species has the phenotype (state 1) and which species have lost it (state 0). List all species (leaves in the tree) where you know the phenotypic state, omit all others. Must be a space-separated file the header 'species pheno'.
+
+Example: 
+```
+species pheno
+Human 1
+Mouse 0
+```
+
+
+4: A file listing the global %id values if you want to run the GLS method and/or a file listing the local (per-branch) %id values if you want to run the branch method. 
+
+Format globalPid.file: Space-separated table with global %id values per element (row) x species (columns). First column must be the element identifier. The first line must start with 'species'. 
+Example:
+```
+species Dog Human Mouse Rat
+ID1 0.96875 0.9375 0.91875 0.9125
+ID2 0.97817 0.97101 0.87234 0.8913043
+```
+
+Format localPid.file: Space-separated file listing the local %id values for one element and one branch on a single line. Must have the header 'branch id pid'. 
+
+Example:
+```
+branch id pid
+Human ID1 0.99375
+Rat ID1 0.97243
+Mouse ID1 0.94129
+Rat-Mouse ID1 0.90097
+```
+
 
 # HowTo
 
