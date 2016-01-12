@@ -163,12 +163,12 @@ readArguments = function(){
       stop( "ERROR: thresholdConserved should be between 0 and 1" )    
 
   # weights and expected %id values
-  if( length(which( argsDF$V1 == "thresholdConserved" )) ) 
+  if( length(which( argsDF$V1 == "weights" )) ) 
     in_brWeights      <<- as.character(argsDF[which( argsDF$V1 == "weights" ),2])
   else
     in_brWeights      <<- paste(scriptDir,"/lookUpData/branchWeights_CDS.txt", sep="")
 
-  if( length(which( argsDF$V1 == "thresholdConserved" )) ) 
+  if( length(which( argsDF$V1 == "expectedPerIDs" )) ) 
     in_meanPidSel     <<- as.character(argsDF[which( argsDF$V1 == "expectedPerIDs" ),2])
   else
     in_meanPidSel     <<- paste(scriptDir,"/lookUpData/expPercentID_CDS.txt", sep="")
