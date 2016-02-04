@@ -21,10 +21,10 @@ loopElements = function(){
       cat(style( paste("Element", elID, "\n"),fg="blue",font.style="bold" ) )
 
       ## Check if there are enough species with data
-      if( in_analysis == "global" || in_analysis == "all" ) if( enoughSpecies( elID ) == FALSE ) next
+      if( in_analysis == "GLS" || in_analysis == "all" ) if( enoughSpecies( elID ) == FALSE ) next
 
       ## Local analysis
-      if( in_analysis == "local" || in_analysis == "all" )
+      if( in_analysis == "branch" || in_analysis == "all" )
         {
           ## Does every leaf have percent id data
           anyMissing = missingData( elID )
@@ -55,11 +55,11 @@ loopElements = function(){
           if( anyMissing == 0 ) treeBased.res = treeBased_analysis( elID, branchCatalog, tree, vcvClade, vcvCladeSel )
 
           ## Return false for no data
-          if( treeBased.res == FALSE ) next        
+          #if( treeBased.res == FALSE ) next        
         }
 
       ## Global analysis
-      if( in_analysis == "global" || in_analysis == "all" ){
+      if( in_analysis == "GLS" || in_analysis == "all" ){
 
         ## GLS analysis
         GLS_analysis( elID )
@@ -188,12 +188,12 @@ enoughSpecies = function( elID ){
 
           ## At least 1 species in each group (lost/conserved)
           grp1 <<- subset(subData.raw, pheno == 1 )
+          n1.spec <<- nrow( grp1 )
           grp0 <<- subset(subData.raw, pheno == 0 )
-          n0 <<- nrow( grp0 )
-          n1 <<- nrow( grp1 )
-          if( n1 == 0 || n0 == 0 ){
-            if( n1 == 0 ) cat("    > No species with phenotype 1 left\n", sep="" )
-            if( n0 == 0 ) cat("    > No species with phenotype 0 left\n", sep="" )
+          n0.spec <<- nrow( grp0 )
+          if( n1.spec == 0 || n0.spec == 0 ){
+            if( n1.spec == 0 ) cat("    > No species with phenotype 1 left\n", sep="" )
+            if( n0.spec == 0 ) cat("    > No species with phenotype 0 left\n", sep="" )
             return( FALSE )
           }        
     
@@ -220,21 +220,23 @@ enoughSpecies = function( elID ){
 saveResult = function ( elID ){
 
   ## Basic info on the element
- basicInfo = c( elID, n0, n1 )
-  
+ if( in_analysis == "GLS" )       basicInfo = c( elID, n0.spec, n1.spec )
+ if( in_analysis == "branch"  )   basicInfo = c( elID, n0.branch, n1.branch )
+ if( in_analysis == "all" )       basicInfo = c( elID, n0.spec, n1.spec, n0.branch, n1.branch )
+ 
   ## Tree-based method  
-  if( in_analysis == "local" || in_analysis == "all" ){
+  if( in_analysis == "branch" || in_analysis == "all" ){
      if( in_collapseClades != "no" ) Res = c( wPearson, wPearsonPval )
      BpB.Res = c( BpB.wPearson, BpB.wPearsonPval  )
      if( in_collapseClades != "no" ) localRes = c( Res, BpB.Res ) else localRes = c( BpB.Res )
   }
   ## Global method 
-  if( in_analysis == "global" || in_analysis == "all" ) globalRes = c( perfectMatch, slopePval )
+  if( in_analysis == "GLS" || in_analysis == "all" ) globalRes = c( perfectMatch, slopePval )
 
   ## Write the result
-  if( in_analysis == "global" ) RES = c( basicInfo, globalRes )
-  if( in_analysis == "local" ) RES = c( basicInfo, localRes )
-  if( in_analysis == "all" ) RES = c( basicInfo, globalRes, localRes )
+  if( in_analysis == "GLS" )    RES = c( basicInfo, globalRes )
+  if( in_analysis == "branch" ) RES = c( basicInfo, localRes )
+  if( in_analysis == "all" )    RES = c( basicInfo, globalRes, localRes )
   write( RES, file=as.character(nameOutput), ncolumns=length(RES), append=TRUE )
 
 }

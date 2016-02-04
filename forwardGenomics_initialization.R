@@ -196,17 +196,9 @@ readArguments = function(){
      cat(style(paste("Output dir................................", out_path, "\n"),fg="red",font.style="bold" ))
   cat(style(paste("Verbose...................................", verbose, "\n"),fg="red",font.style="bold" ))
 
-
-  #############
-  # internally we use 'local' for the branch method and 'global' for GLS
-  if( in_analysis == "branch" )
-     in_analysis <<- "local"
-  if( in_analysis == "GLS" )
-     in_analysis <<- "global"
-
   #############
   # Parse parameters for the branch method
-  if( in_analysis == "local" || in_analysis == "all" ){
+  if( in_analysis == "branch" || in_analysis == "all" ){
     if( !length(which( argsDF$V1 == "localPid" )) ) 
        stop(paste("Argument localPid is missing if you want to run the branch method" ))
     else
@@ -233,7 +225,7 @@ readArguments = function(){
 
   #############
   # Parse parameters for GLS
-  if( in_analysis == "global" || in_analysis == "all" ){
+  if( in_analysis == "GLS" || in_analysis == "all" ){
     if( !length(which( argsDF$V1 == "globalPid" )) ) 
        stop(paste("Argument globalPid is missing if you want to run the GLS method" ))
     else
@@ -317,7 +309,7 @@ inputFiles = function()
   
   ## ---------------
   ## Input local percent id
-  if( in_analysis == "local" || in_analysis == "all" )
+  if( in_analysis == "branch" || in_analysis == "all" )
     {
       ## Open the data file
       in_localPid <<- read.table( in_localPid, header=T )
@@ -347,7 +339,7 @@ inputFiles = function()
   
   ## ---------------
   ## Input global percentID
-  if( in_analysis == "global" || in_analysis == "all" )
+  if( in_analysis == "GLS" || in_analysis == "all" )
     {
       ## Open the data file
       in_globalPid <<- read.table( in_globalPid, row.names=1, header=T )
@@ -430,20 +422,24 @@ rm.Species = function(){
 outputFiles = function(){
 
   ## Header for the output per element
-#  nameOutput <<- paste( out_path, "/", out_data, sep="" )
   nameOutput <<- out_data
   unlink( nameOutput )
+  
   ## Basic infor
-  basicInfo = c( "elementID", "n0", "n1" )
+  if( in_analysis == "GLS" )       basicInfo = c( "elementID", "numTraitLossSpecies", "numTraitPreservingSpecies" )
+  if( in_analysis == "branch"  )   basicInfo = c( "elementID", "numTraitLossBranches", "numTraitPreservingBranches" )
+  if( in_analysis == "all" )       basicInfo = c( "elementID", "numTraitLossSpecies", "numTraitPreservingSpecies", "numTraitLossBranches", "numTraitPreservingBranches" )
+
   ## Local methods
   Res = c( "wPearson", "wPearsonPval" )
   BpB.Res = c( "weightedPearsonCorrelationCoeff", "weightedPearsonCorrelation_Pvalue" )
   if( in_collapseClades != "no" ) localRes = c( Res, BpB.Res ) else localRes = c( BpB.Res )
   ## Global method 
   globalRes = c( "PerfectMatchMargin", "GLS_Pvalue" )
+  
   ## Make the header
-  if( in_analysis == "global" ) header = c( basicInfo, globalRes, "\n" )
-  if( in_analysis == "local"  ) header = c( basicInfo, localRes, "\n" )
+  if( in_analysis == "GLS" ) header = c( basicInfo, globalRes, "\n" )
+  if( in_analysis == "branch"  ) header = c( basicInfo, localRes, "\n" )
   if( in_analysis == "all" ) header = c( basicInfo, globalRes, localRes, "\n" )  
   cat(header, file=nameOutput, sep=" ")
 } 
@@ -581,7 +577,7 @@ prepareTree = function( thisTree, theseLossNodes ){
 
   ## -------------------------------------------------
   ## Global analysis, we only need to know the subtree
-  if( in_analysis == "global" || in_analysis == "all" )
+  if( in_analysis == "GLS" || in_analysis == "all" )
     {
       subTree = rep( -1, length(br) )
       thisBranchCatalog = data.frame( br, subTree )
@@ -610,7 +606,7 @@ prepareTree = function( thisTree, theseLossNodes ){
 
   ## -----------------------------------------------------------------
   ## Local analysis, a detailled description of each branch is required
-  if( in_analysis == "local" || in_analysis == "all" )
+  if( in_analysis == "branch" || in_analysis == "all" )
     {
       stat    = rep( -1, length(br) )
       w       = rep( -1, length(br) )
@@ -730,7 +726,7 @@ prepareTree = function( thisTree, theseLossNodes ){
     }
 
   ## Gather the clades under selection
-     if( in_analysis == "local" || in_analysis == "all" )
+     if( in_analysis == "branch" || in_analysis == "all" )
        if( in_collapseClades != "neutralOnly"  && in_collapseClades != "no" ) thisvcvCladeSel = gatherConservedBranches( thisBranchCatalog, thisTree )
   
   ## Overview of the analysis

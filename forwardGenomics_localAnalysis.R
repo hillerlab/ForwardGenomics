@@ -30,9 +30,6 @@ listInitial = function(){
   ## Status
   BpB.brStatus <<- c()
 
-  ## Number of branches in the analysis
-  n1 <<- 0
-  n0 <<- 1
 }
 
 
@@ -52,7 +49,7 @@ treeBased_analysis = function( elID, thisCatalog, thisTree, thisvcvClade, thisvc
     cat(style(" ==================================\n", font.style="bold") )
   }
   branch.subTree <<- thisCatalog
-  BpB.anl = na.omit(computeExpDist( elID ))
+  BpB.anl = na.omit(computeExpDist( elID, thisTree ))
 
   ## Total size of the data for that element
   n = nrow( BpB.anl )
@@ -60,7 +57,8 @@ treeBased_analysis = function( elID, thisCatalog, thisTree, thisvcvClade, thisvc
   ## If no branches for that element
   if( is.null(n) || n == 0 ){
     cat("No branches data for that element\n")
-    return(FALSE)
+    allOutputToNA = TRUE
+   # return(FALSE)
   }
   else{
 
@@ -69,11 +67,11 @@ treeBased_analysis = function( elID, thisCatalog, thisTree, thisvcvClade, thisvc
 
     ## Conserved branches
     BpB.anl.sel  = na.omit(subset( BpB.anl, stat == 1 ))
-    n1 <<- nrow( BpB.anl.sel )
-    if( !is.null(n1) ){
+    n1.branch <<- nrow( BpB.anl.sel )
+    if( !is.null(n1.branch) ){
       
       ## If no branches
-      if( n1 == 0 ){
+      if( n1.branch == 0 ){
         if( verbose ) cat("No conserved branches for the analysis, all outputs set to NA\n")
         allOutputToNA = TRUE
       }
@@ -81,24 +79,24 @@ treeBased_analysis = function( elID, thisCatalog, thisTree, thisvcvClade, thisvc
       ## Branches under selection
       if( in_collapseClades == "no" ){
         branch.subTree <<- na.omit(subset( thisCatalog, subTree == -1 ))
-        selec.subTree = computeExpDist( elID )
+        selec.subTree = computeExpDist( elID, thisTree )
         selBranchesDist      <<- c( selBranchesDist, selec.subTree$Dist )
       }
-      BpB.brWeights       <<- c( BpB.brWeights, rep( times = n1, x = 1 ) )
-      BpB.brStatus        <<- c( BpB.brStatus, rep( times = n1, x = 1 ) )
+      BpB.brWeights       <<- c( BpB.brWeights, rep( times = n1.branch, x = 1 ) )
+      BpB.brStatus        <<- c( BpB.brStatus, rep( times = n1.branch, x = 1 ) )
       BpB.totBranchesDist  <<- c( BpB.totBranchesDist, BpB.anl.sel$Dist )
 
       ## Neutral
       BpB.anl.neut  = na.omit(subset( BpB.anl, stat == 0 ))
-      n0 <<- nrow( BpB.anl.neut )
+      n0.branch <<- nrow( BpB.anl.neut )
       ## If no neutral branches
-      if( !is.null(n0) ){      
-        if( n0 == 0 ){
+      if( !is.null(n0.branch) ){      
+        if( n0.branch == 0 ){
            if( verbose ) cat("No neutral branches for the analysis, all outputs set to NA\n")
            allOutputToNA = TRUE        
         }          
         BpB.brWeights       <<- c( BpB.brWeights, BpB.anl.neut$w )
-        BpB.brStatus        <<- c( BpB.brStatus, rep( times = n0, x = 0 ) )
+        BpB.brStatus        <<- c( BpB.brStatus, rep( times = n0.branch, x = 0 ) )
         BpB.totBranchesDist  <<- c( BpB.totBranchesDist, BpB.anl.neut$Dist )
         BpB.neutBranchesWeights  <<- c( BpB.neutBranchesWeights, BpB.anl.neut$w )
         BpB.neutBranchesDist      <<- c( BpB.neutBranchesDist, BpB.anl.neut$Dist )     
@@ -124,7 +122,7 @@ treeBased_analysis = function( elID, thisCatalog, thisTree, thisvcvClade, thisvc
       if( clade == -1 )        
         {
           ## Compute the distance to the expected value
-          selec.subTree = computeExpDist( elID )
+          selec.subTree = computeExpDist( elID, thisTree )
           ## Reject the element is a big event occured on a conserved branch
           if( is.logical(selec.subTree) ){
             if( verbose ) cat("Some large deletion occured on a conserved branch, all outputs set to NA\n")
@@ -193,7 +191,7 @@ treeBased_analysis = function( elID, thisCatalog, thisTree, thisvcvClade, thisvc
           
           ## Only one tip in the clade
           if( nTips == 1 && nBr == nTips ){
-            oneTip.subTree = computeExpDist( elID )
+            oneTip.subTree = computeExpDist( elID, thisTree )
             n = nrow( oneTip.subTree )
             if( n == 0 ){
               if( verbose ) cat("No branches for the analysis, all outputs set to NA\n")
@@ -269,6 +267,8 @@ statTestsOnBranches = function( allOutputToNA ){
 
 ## If no data for the signal branches or species
   if( allOutputToNA ){
+    n0.branch       <<- "NA"
+    n1.branch       <<- "NA"
     wPearson          <<- "NA"
     wPearsonPval      <<- "NA"
     BpB.wPearson          <<- "NA"
@@ -374,8 +374,8 @@ computeExpDist.clade = function( elID, clade, thisTree ){
 ##########################################################################
 ## Compute the distance to the expected value branch per branch
 ##########################################################################
-computeExpDist = function( elID ){
-  
+computeExpDist = function( elID, thisTree ){
+
   ## Data for all the branches for that element, omit branches with NA
   el.branch = na.omit(subset( in_localPid, br %in% branch.subTree$br & id == elID ))
   
@@ -395,18 +395,24 @@ computeExpDist = function( elID ){
   ## distance: el(pid) - mean(pid(sim))
   el.branch$Dist = el.branch$pid - el.branch$mPid
 
-  ## Threshold for big events (large indels) on conserved branches
-  bigEvent = which( el.branch$stat == 1 && el.branch$pid <= in_thresholdConserved )
-  if( length(bigEvent) != 0 ){
-    cat(paste("Large indel occured on a conserved branch:\n") )
+  ## Threshold for big events (large indels) on conserved internal branches (not tips)
+  bigEvent = subset( el.branch, stat == 1 & pid <= in_thresholdConserved  )
+  bigDelEvent = FALSE
+  internBranch = FALSE
+  if( nrow(bigEvent) != 0 ){
+    bigDelEvent = TRUE
+  for( i in 1:nrow(bigEvent) )if( bigEvent$br[i] %in% thisTree$node.label ) internBranch = TRUE
+  }
+  
+  if( bigDelEvent && internBranch ){
+    cat(paste("Large indel occured on a conserved internal branch:\n") )
     if( verbose ){
-      print(as.vector(el.branch$br[bigEvent]))
+      print( bigEvent )
       cat("\n")
-      print(el.branch)
     }
     return( FALSE )
   }
-
+  
   if( verbose ){
     cat("\n")
     cat(style("    > Subset of branches\n",font.style="bold" ) )
