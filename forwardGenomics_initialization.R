@@ -315,7 +315,7 @@ inputFiles = function()
       in_localPid <<- read.table( in_localPid, header=T )
 
       ## Extract the data for the elements under study
-     in_localPid <<- in_localPid[ in_elements$V1 %in% in_localPid$id, ]
+     in_localPid <<- in_localPid[ in_localPid$id %in% in_elements$V1 , ]
       
       ## Check for double entries
       if( nrow(in_localPid) != nrow( in_localPid[ !duplicated(in_localPid), ]) )

@@ -112,7 +112,7 @@ missingData = function( elID ){
     if( nLossRemain >= 2 && nConsRemain >= 2 )
       return( 1 )
     else{
-      if( verbose ) cat("\nNot enough species left to proceed with the anaysis\n")
+      if( verbose ) cat("\nNot enough species left to proceed\n")
       return( 2 )
     }
   }
