@@ -151,6 +151,6 @@ Optional arguments for the branch method:
 ```
 
 # References
-[1] Hiller M, Schaar BT, Indjeian VB, Kingsley DM, Hagey LR, and Bejerano G: [A "forward genomics" approach links genotype to phenotype using independent phenotypic losses among related species](http://www.cell.com/cell-reports/fulltext/S2211-1247(12)00272-0). Cell Reports, 2(4), 817-823, 2012
+[1] Hiller M, Schaar BT, Indjeian VB, Kingsley DM, Hagey LR, and Bejerano G. [A "forward genomics" approach links genotype to phenotype using independent phenotypic losses among related species](http://www.cell.com/cell-reports/fulltext/S2211-1247(12)00272-0). Cell Reports, 2(4), 817-823, 2012
 
-[2] Prudent X, Parra G, Schwede P, Roscito JG, and Hiller M (2016). [Controlling for phylogenetic relatedness and evolutionary rates improves the discovery of associations between species’ phenotypic and genomic differences](https://academic.oup.com/mbe/article-lookup/doi/10.1093/molbev/msw098). Mol Bio Evol. 33(8):2135-50, 2016
+[2] Prudent X, Parra G, Schwede P, Roscito JG, and Hiller M. [Controlling for phylogenetic relatedness and evolutionary rates improves the discovery of associations between species’ phenotypic and genomic differences](https://academic.oup.com/mbe/article-lookup/doi/10.1093/molbev/msw098). Mol Bio Evol. 33(8):2135-50, 2016
