@@ -1,4 +1,4 @@
-#!/sw/bin/perl
+#!/usr/bin/perl
 
 # Michael Hiller, 2015
 # simple script to convert a tree.mod into a newick file. 

@@ -1,4 +1,4 @@
-#!/sw/bin/perl
+#!/usr/bin/perl
 
 # Michael Hiller, 2015
 # revamp of the %id calculation.

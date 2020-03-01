@@ -1,4 +1,4 @@
-#!/sw/bin/perl
+#!/usr/bin/perl
 
 # Michael Hiller, 2015
 # given a maf file listing a single region (cons el), read all maf blocks and determine the sequence coordinates that cover maf block 1-N
