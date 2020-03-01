@@ -9,7 +9,6 @@ use warnings;
 use lib "$ENV{'genomePath'}/src/LabPerlModules/";
 use Getopt::Long qw(:config no_ignore_case no_auto_abbrev);
 use MyBDB;
-use MyFunctions;
 use Bio::SeqIO;
 use Bio::Tree::Draw::Cladogram;
 use Bio::Tree::Tree;
@@ -126,6 +125,18 @@ my $elementLength = getElementLength($elementsFile);
 
 # now compute %id
 doit($ARGV[0]);
+
+#########################################################################################################
+## given an array, the function inits a hash with each element (hash value set to 1)
+## returns pointer to hash
+##########################################################################################################
+sub arrayToHash {
+	my %H;
+	foreach my $element (@_) {
+		$H{$element} = 1;
+	};
+	return \%H;
+}
 
 
 ##################################################################

@@ -19,7 +19,6 @@ use lib "$ENV{'genomePath'}/src/LabPerlModules/";
 
 use Getopt::Long qw(:config no_ignore_case no_auto_abbrev);
 use Globals;
-use MyFunctions;
 use MyKentFunctions;
 use MyBDB;
 
