@@ -4,7 +4,7 @@ package MyKentFunctions;
 use strict;
 use Exporter;
 use Globals;
-use MyFunctions;
+#use MyFunctions;
 use Scalar::Util::Numeric qw(isint);
 	
 our @ISA = ('Exporter');

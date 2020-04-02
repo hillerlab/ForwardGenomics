@@ -15,15 +15,14 @@
 use strict;
 use warnings;
 use Env;
-use lib "$ENV{'genomePath'}/src/LabPerlModules/";
+use lib "./";
 
 use Getopt::Long qw(:config no_ignore_case no_auto_abbrev);
-use Globals;
+#use Globals;
 use MyKentFunctions;
 use MyBDB;
 
-my $genomePath = $ENV{'genomePath'};
-die "ERROR: directory specified in environment variable genomePath (set to $genomePath) does not exist\n" if (! -d $genomePath);
+my $twoBitPath = "";
 
 # options
 # Pls see the usage() for an explanation of each parameter
@@ -37,14 +36,15 @@ my $keepTemporaryFiles = 0;
 my $maxAlignmentLength = 10000000000000;		# do not run prank if the total number of bp in the ali exceed this number. Purpose: dont start long jobs until the user pushes them to the long queue
 
 sub usage {
-	die "usage: $0 Maf_or_BDBFile ElementID  -v|-verbose  [PARAMETERS]
+	die "usage: $0 Maf_or_BDBFile ElementID -twoBitPath  -v|-verbose  [PARAMETERS]
 \
 $0 will read the maf from either a BDB file or a maf file (must have the suffix .maf) produced by mafExtract
 It gets the sequences spanned by the first and last s-line block for each species and outputs them.
+The -twoBitPath parameter must point to the directory that contains the species/species.2bit files. 
 Optionally, you can directly run prank and $0 outputs the alignment and the named ancestors. 	
 \
 general parameters:
-	-TwoBitSuffix string [default .2bit]      suffix of the $genomePath/gbdb-HL/species/species.$TwoBitSuffix 2bit file. Use .quality.2bit to use the quality-masked files
+	-TwoBitSuffix string [default .2bit]      suffix of the twoBitPath/species/species.$TwoBitSuffix 2bit file. Use .quality.2bit to use the quality-masked files
 	-noMissingSeq                             flag: if set, we will exclude species that do not have s or e lines for each given maf block (the missing blocks must be assembly gaps)
 \
 parameters for running prank:
@@ -54,10 +54,12 @@ parameters for running prank:
 	-keepTemporaryFiles                       flag: keep the prank files.
 	-maxAlignmentLength int                   error-exit if the number of bp in the ali exceed this threshold (default $maxAlignmentLength). Use it to filter out long-running jobs for the long queue.\n"
 };
-GetOptions ("TwoBitSuffix=s" => \$TwoBitSuffix, "v|verbose"  => \$verbose,	"runPrank" => \$runPrankFlag, 
+GetOptions ("twoBitPath=s" => \$twoBitPath, "TwoBitSuffix=s" => \$TwoBitSuffix, "v|verbose"  => \$verbose,	"runPrank" => \$runPrankFlag, 
 	"BDBFile=s" => \$BDBFile, "treeFile=s" => \$treeFile, "maxAlignmentLength=i" => \$maxAlignmentLength,
 	"keepTemporaryFiles" => \$keepTemporaryFiles, "noMissingSeq" => \$noMissingSeq) || usage();
 usage() if ($#ARGV < 1);
+
+die "ERROR: You must set the -twoBitPath parameter\n" if ($twoBitPath eq "");
 
 if ($verbose) {
 	$| = 1;		# == fflush(stdout)
@@ -337,8 +339,8 @@ sub outputSpanningSeq {
 		}
 		
 		# retrieve the seq and print
-		my $seq = getSeqTwoBitFile($species2Chrom{$species}, $startPlus, $endPlus, $species2Strand{$species}, "$genomePath/gbdb-HL/$species/$species$TwoBitSuffix", $unmaskFlag);
-		print "retrieve ", $endPlus-$startPlus, " bp sequence for $species $species2Chrom{$species}:$startPlus-$endPlus from 2bit file: $genomePath/gbdb-HL/$species/$species$TwoBitSuffix\n";
+		my $seq = getSeqTwoBitFile($species2Chrom{$species}, $startPlus, $endPlus, $species2Strand{$species}, "$twoBitPath/$species/$species$TwoBitSuffix", $unmaskFlag);
+		print "retrieve ", $endPlus-$startPlus, " bp sequence for $species $species2Chrom{$species}:$startPlus-$endPlus from 2bit file: $twoBitPath/$species/$species$TwoBitSuffix\n";
 		if ($filename ne "") {
 			print FILEOUT ">$species\n$seq\n";
 			$speciesCount++;

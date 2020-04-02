@@ -6,7 +6,7 @@
 
 use strict;
 use warnings;
-use lib "$ENV{'genomePath'}/src/LabPerlModules/";
+use lib "./";
 use Getopt::Long qw(:config no_ignore_case no_auto_abbrev);
 use MyBDB;
 use Bio::SeqIO;
