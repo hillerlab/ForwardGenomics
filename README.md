@@ -150,6 +150,26 @@ Optional arguments for the branch method:
                 Some element may have large indels on internal conserved branches, but descendant branches are highly conserved. We reject genomic elements if a local %id value is lower than this threshold for a conserved branch. Set to 0 to ignore this. Default: 0.5
 ```
 
+# Computing %id values
+This is a minimal recipe.
+
+Setup and input: You need the binaries of the UCSC genome browser (kent) source code, in particular twoBitToFa, and prank. The path to these binaries must be included in the $PATH variable. 
+Each assembly must be in a $genomePath/gbdb-HL/$assembly/$assembly.2bit directory structure. The $genomePath variable can be set as a bash environment variable and is read out by the scripts. 
+The region of interest should be contained in maf file. 
+
+To minimize the number of input and output files in big cluster jobs, we typically store and retrieve the results in a BDB file hash, which requires a installing BDB. Without BDB, a few changes in the scripts will be necessary to output into a text file, instead of a BDB file.  
+
+```Maf2SpanningSeq_PRANK.perl maf.file ElementID -runPrank -treeFile tree.file -BDBFile output.bdb```
+where maf.file is the input maf, ElementID is the name of the element, tree.file contains the phylo tree in Newick format and output.bdb determines the output BDB File that will contain the alignment with reconstructed ancestors. 
+
+The script extracts the start and end coords of every species (the reason is that a single region is often broken into different maf blocks and there can be insertions between these maf blocks). Then it runs UCSC twoBitToFa to extract the seq of all species and runs Prank with the given species tree, which gives a full alignment including reconstructed ancestors. 
+
+
+```GetGlobalAndLocalPercentID.perl output.bdb ElementID -treeFile tree.file -allowedAncestralNodes ancNodes -local -global -GlobalBDBFile global.bdb  -LocalBDBFile local.bdb```
+where ancNodes is comma-separated list of node names that refer to ingroup ancestors to be used for %id calculation, and global/local.bdb refers to the BDB files containing the %id values. They can be later read out by ReadBDB.perl
+
+
+
 # References
 [1] Hiller M, Schaar BT, Indjeian VB, Kingsley DM, Hagey LR, and Bejerano G. [A "forward genomics" approach links genotype to phenotype using independent phenotypic losses among related species](http://www.cell.com/cell-reports/fulltext/S2211-1247(12)00272-0). Cell Reports, 2(4), 817-823, 2012
 
