@@ -176,7 +176,7 @@ sub getSeqTwoBitFile {
 		die "ERROR in getSeqTwoBitFile: $TwoBitFile does not exist\n";
 	}
 	
-	my $call = "set -o pipefail; echo -e \"$chr\\t$start\\t$end\\tname\\t1000\\t$strand\" | twoBitToFa $TwoBitFile stdout -bed=stdin $unmaskParameter";
+	my $call = "set -o pipefail; printf \"$chr\\t$start\\t$end\\tname\\t1000\\t$strand\" | twoBitToFa $TwoBitFile stdout -bed=stdin $unmaskParameter";
 	print "$call\n" if ($verbose);
 	my @res = `$call`;
 	die "ERROR in getSeqTwoBitFile: $call failed\n" if ($? != 0 || ${^CHILD_ERROR_NATIVE} != 0);
