@@ -161,6 +161,8 @@ To minimize the number of input and output files in big cluster jobs, we typical
 
 ```Maf2SpanningSeq_PRANK.perl maf.file ElementID -runPrank -treeFile tree.file -BDBFile output.bdb```
 where maf.file is the input maf, ElementID is the name of the element, tree.file contains the phylo tree in Newick format and output.bdb determines the output BDB File that will contain the alignment with reconstructed ancestors. 
+NOTE that ElementID is a SINGLE element (not a list). 
+Alternatively, if you have individual maf files, each containing only 1 element, you can also run ```Maf2SpanningSeq_PRANK.perl individual.maf NULL -runPrank -treeFile tree.file```. It must have the ending .maf.
 
 The script extracts the start and end coords of every species (the reason is that a single region is often broken into different maf blocks and there can be insertions between these maf blocks). Then it runs UCSC twoBitToFa to extract the seq of all species and runs Prank with the given species tree, which gives a full alignment including reconstructed ancestors. 
 
